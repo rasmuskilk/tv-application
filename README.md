@@ -47,7 +47,7 @@ erDiagram
         int id PK
         varchar(64) name
         varchar(255) description
-        enum program_type "asd"
+        enum program_type
         int duration
         int number_of_episodes
     }
