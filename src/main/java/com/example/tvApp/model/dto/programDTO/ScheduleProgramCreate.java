@@ -12,13 +12,9 @@ import java.util.List;
 public record ScheduleProgramCreate(
         Integer programId,
         List<RecurringDays> recurringDays,
-        @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-        @Schema(type = "string", format = "time") // Indicate the type is time
-        @JsonFormat(pattern = "HH:mm:ss") // Specify the desired format
+        @JsonFormat(pattern = "HH:mm:ss")
+        @Schema(type = "string", example = "21:00:00")
         LocalTime startTime,
-        @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-        @Schema(type = "string", format = "time") // Indicate the type is time
-        @JsonFormat(pattern = "HH:mm:ss") // Specify the desired format
         LocalDate startDate
 ) {
 }

@@ -11,18 +11,17 @@ import org.springframework.http.HttpStatus;
 
 import java.time.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ScheduleHelper {
     public static List<ScheduleForAllChannels> createScheduleForAllChannels(List<ScheduleForChannel> scheduledPrograms, Integer days, LocalDate startDate) {
         List<ScheduleForAllChannels> schedule = new ArrayList<>();
 
-        for (ScheduleForChannel scheduledProgram : scheduledPrograms) {
-            schedule.add(new ScheduleForAllChannels(
-                    scheduledProgram.channelName(),
-                    createSchedule(scheduledPrograms.stream()
-                            .filter(scheduleForChannel -> scheduleForChannel.channelName().equals(scheduledProgram.channelName()))
-                            .toList(), days, startDate)
-            ));
+        Map<String, List<ScheduleForChannel>> scheduleMap = scheduledPrograms.stream()
+                .collect(Collectors.groupingBy(ScheduleForChannel::channelName));
+
+        for (Map.Entry<String, List<ScheduleForChannel>> entry : scheduleMap.entrySet()) {
+            schedule.add(new ScheduleForAllChannels(entry.getKey(), createSchedule(entry.getValue(), days, startDate)));
         }
 
         return schedule;
