@@ -2,7 +2,7 @@ package com.example.tvApp.mapper.rowMapper;
 
 import com.example.tvApp.helpers.enums.ProgramType;
 import com.example.tvApp.helpers.enums.RecurringDays;
-import com.example.tvApp.model.dto.channelDTO.ChannelScheduledProgram;
+import com.example.tvApp.model.dto.scheduleDTO.ScheduleForChannel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +16,9 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Component
-public class ChannelScheduledProgramRowMapper implements RowMapper<ChannelScheduledProgram> {
+public class ChannelScheduledProgramRowMapper implements RowMapper<ScheduleForChannel> {
     @Override
-    public ChannelScheduledProgram mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public ScheduleForChannel mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         String recurringDaysJson = rs.getString("recurringDays");
 
@@ -31,7 +31,7 @@ public class ChannelScheduledProgramRowMapper implements RowMapper<ChannelSchedu
             throw new RuntimeException(e);
         }
 
-        return new ChannelScheduledProgram(
+        return new ScheduleForChannel(
                 rs.getString("channelName"),
                 rs.getString("programName"),
                 rs.getString("programDescription"),

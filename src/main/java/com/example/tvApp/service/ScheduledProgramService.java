@@ -9,7 +9,7 @@ import com.example.tvApp.mapper.ScheduledProgramMapper;
 import com.example.tvApp.model.Channel;
 import com.example.tvApp.model.Program;
 import com.example.tvApp.model.ScheduledProgram;
-import com.example.tvApp.model.dto.channelDTO.ChannelScheduledProgram;
+import com.example.tvApp.model.dto.scheduleDTO.ScheduleForChannel;
 import com.example.tvApp.model.dto.programDTO.ScheduleProgramCreate;
 import com.example.tvApp.model.dto.scheduleDTO.ScheduleForAllChannels;
 import com.example.tvApp.model.dto.scheduleDTO.ScheduleGet;
@@ -40,7 +40,7 @@ public class ScheduledProgramService {
     }
 
     public List<ScheduleForAllChannels> getScheduleForAllChannels(LocalDate startDate, LocalDate endDate) {
-        List<ChannelScheduledProgram> scheduledPrograms = scheduledProgramRepository.findAllForChannels();
+        List<ScheduleForChannel> scheduledPrograms = scheduledProgramRepository.findAllForChannels();
 
         if (startDate == null) {
             startDate = LocalDate.now();
@@ -66,7 +66,7 @@ public class ScheduledProgramService {
 
         ValidationHelpers.validateStartAndEndDates(startDate, endDate);
 
-        List<ChannelScheduledProgram> scheduledPrograms = scheduledProgramRepository.findAllByChannelId(channelId);
+        List<ScheduleForChannel> scheduledPrograms = scheduledProgramRepository.findAllByChannelId(channelId);
 
         return ScheduleHelper.createSchedule(scheduledPrograms, getDaysBetween(startDate, endDate), startDate);
     }
@@ -81,7 +81,7 @@ public class ScheduledProgramService {
 
         ValidationHelpers.validateStartAndEndDates(startDate, endDate);
 
-        List<ChannelScheduledProgram> scheduledPrograms = scheduledProgramRepository.findAllByProgramType(programType);
+        List<ScheduleForChannel> scheduledPrograms = scheduledProgramRepository.findAllByProgramType(programType);
 
         return ScheduleHelper.createScheduleForAllChannels(scheduledPrograms, getDaysBetween(startDate, endDate), startDate);
     }
@@ -92,7 +92,7 @@ public class ScheduledProgramService {
 
         validateScheduledProgram(scheduleProgramCreate, program);
 
-        List<ChannelScheduledProgram> scheduledPrograms = scheduledProgramRepository.findAllByChannelId(channelId);
+        List<ScheduleForChannel> scheduledPrograms = scheduledProgramRepository.findAllByChannelId(channelId);
 
         ScheduleHelper.validateAvailableTimeSlotForNewProgram(scheduleProgramCreate, scheduledPrograms, program);
 

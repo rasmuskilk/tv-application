@@ -3,7 +3,7 @@ package com.example.tvApp.helpers;
 import com.example.tvApp.exceptions.ApiException;
 import com.example.tvApp.helpers.enums.RecurringDays;
 import com.example.tvApp.model.Program;
-import com.example.tvApp.model.dto.channelDTO.ChannelScheduledProgram;
+import com.example.tvApp.model.dto.scheduleDTO.ScheduleForChannel;
 import com.example.tvApp.model.dto.programDTO.ScheduleProgramCreate;
 import com.example.tvApp.model.dto.scheduleDTO.ScheduleForAllChannels;
 import com.example.tvApp.model.dto.scheduleDTO.ScheduleGet;
@@ -13,14 +13,14 @@ import java.time.*;
 import java.util.*;
 
 public class ScheduleHelper {
-    public static List<ScheduleForAllChannels> createScheduleForAllChannels(List<ChannelScheduledProgram> scheduledPrograms, Integer days, LocalDate startDate) {
+    public static List<ScheduleForAllChannels> createScheduleForAllChannels(List<ScheduleForChannel> scheduledPrograms, Integer days, LocalDate startDate) {
         List<ScheduleForAllChannels> schedule = new ArrayList<>();
 
-        for (ChannelScheduledProgram scheduledProgram : scheduledPrograms) {
+        for (ScheduleForChannel scheduledProgram : scheduledPrograms) {
             schedule.add(new ScheduleForAllChannels(
                     scheduledProgram.channelName(),
                     createSchedule(scheduledPrograms.stream()
-                            .filter(channelScheduledProgram -> channelScheduledProgram.channelName().equals(scheduledProgram.channelName()))
+                            .filter(scheduleForChannel -> scheduleForChannel.channelName().equals(scheduledProgram.channelName()))
                             .toList(), days, startDate)
             ));
         }
@@ -28,10 +28,10 @@ public class ScheduleHelper {
         return schedule;
     }
 
-    public static List<ScheduleGet> createSchedule(List<ChannelScheduledProgram> programs, Integer days, LocalDate start) {
+    public static List<ScheduleGet> createSchedule(List<ScheduleForChannel> programs, Integer days, LocalDate start) {
         List<ScheduleGet> scheduledPrograms = new ArrayList<>();
 
-        for (ChannelScheduledProgram program : programs) {
+        for (ScheduleForChannel program : programs) {
             List<RecurringDays> recurringDays = program.recurringDays();
             LocalTime startTime = program.startTime();
             LocalTime endTime = program.endTime();
@@ -69,43 +69,43 @@ public class ScheduleHelper {
         return scheduledPrograms;
     }
 
-    public static void validateAvailableTimeSlotForNewProgram(ScheduleProgramCreate scheduleProgramCreate, List<ChannelScheduledProgram> scheduledPrograms, Program program) {
+    public static void validateAvailableTimeSlotForNewProgram(ScheduleProgramCreate scheduleProgramCreate, List<ScheduleForChannel> scheduledPrograms, Program program) {
         LocalTime startTime = scheduleProgramCreate.startTime();
         LocalTime endTime = scheduleProgramCreate.startTime().plusMinutes(program.duration());
         LocalDate startDate = scheduleProgramCreate.startDate();
 
-        for (ChannelScheduledProgram channelScheduledprogram : scheduledPrograms) {
+        for (ScheduleForChannel scheduleForChannelScheduledprogram : scheduledPrograms) {
             // Program scheduled for all days
             if (scheduleProgramCreate.recurringDays().contains(RecurringDays.ALL)) {
                 // Can't conflict with any program at the time slot
-                validateTimeSlot(startTime, endTime, channelScheduledprogram);
+                validateTimeSlot(startTime, endTime, scheduleForChannelScheduledprogram);
             }
             // Program scheduled for once
             else if (scheduleProgramCreate.recurringDays().contains(RecurringDays.NONE)) {
                 // Can not schedule at the time slot of other program scheduled for all days
-                if (channelScheduledprogram.recurringDays().contains(RecurringDays.ALL)) {
-                    if (startDate.isBefore(channelScheduledprogram.startDate())) {
+                if (scheduleForChannelScheduledprogram.recurringDays().contains(RecurringDays.ALL)) {
+                    if (startDate.isBefore(scheduleForChannelScheduledprogram.startDate())) {
                         return;
                     }
-                    validateTimeSlot(startTime, endTime, channelScheduledprogram);
+                    validateTimeSlot(startTime, endTime, scheduleForChannelScheduledprogram);
                 }
                 // Can not schedule at the time slot of other program scheduled once
-                if (channelScheduledprogram.recurringDays().contains(RecurringDays.NONE)) {  // Already scheduled program for once
-                    if (startDate.equals(channelScheduledprogram.startDate())) {
-                        validateTimeSlot(startTime, endTime, channelScheduledprogram);
+                if (scheduleForChannelScheduledprogram.recurringDays().contains(RecurringDays.NONE)) {  // Already scheduled program for once
+                    if (startDate.equals(scheduleForChannelScheduledprogram.startDate())) {
+                        validateTimeSlot(startTime, endTime, scheduleForChannelScheduledprogram);
                     }
                 }
                 // Can not schedule at the time slot of other program scheduled for specific days
-                if (channelScheduledprogram.recurringDays().contains(RecurringDays.valueOf(startDate.getDayOfWeek().name()))) {
-                    validateTimeSlot(startTime, endTime, channelScheduledprogram);
+                if (scheduleForChannelScheduledprogram.recurringDays().contains(RecurringDays.valueOf(startDate.getDayOfWeek().name()))) {
+                    validateTimeSlot(startTime, endTime, scheduleForChannelScheduledprogram);
                 }
             }
             // Program scheduled for specific days
             else {
                 for (RecurringDays recurringDay : scheduleProgramCreate.recurringDays()) {
-                    if (channelScheduledprogram.recurringDays().contains(RecurringDays.ALL) ||
-                            getRecurringDay(recurringDay, channelScheduledprogram.recurringDays()) != null) {
-                        validateTimeSlot(startTime, endTime, channelScheduledprogram);
+                    if (scheduleForChannelScheduledprogram.recurringDays().contains(RecurringDays.ALL) ||
+                            getRecurringDay(recurringDay, scheduleForChannelScheduledprogram.recurringDays()) != null) {
+                        validateTimeSlot(startTime, endTime, scheduleForChannelScheduledprogram);
                     }
                 }
             }
@@ -148,13 +148,13 @@ public class ScheduleHelper {
         return null;
     }
 
-    private static void validateTimeSlot(LocalTime startTime, LocalTime endTime, ChannelScheduledProgram channelScheduledprogram) {
-        boolean isSameStartTime = startTime.equals(channelScheduledprogram.startTime());
-        boolean isStartTimeDuringOtherProgramAirTime = startTime.isAfter(channelScheduledprogram.startTime()) && startTime.isBefore(channelScheduledprogram.endTime());
-        boolean isEndTimeDuringOtherProgramAirTime = endTime.isAfter(channelScheduledprogram.startTime()) && endTime.isBefore(channelScheduledprogram.endTime());
+    private static void validateTimeSlot(LocalTime startTime, LocalTime endTime, ScheduleForChannel scheduleForChannelScheduledprogram) {
+        boolean isSameStartTime = startTime.equals(scheduleForChannelScheduledprogram.startTime());
+        boolean isStartTimeDuringOtherProgramAirTime = startTime.isAfter(scheduleForChannelScheduledprogram.startTime()) && startTime.isBefore(scheduleForChannelScheduledprogram.endTime());
+        boolean isEndTimeDuringOtherProgramAirTime = endTime.isAfter(scheduleForChannelScheduledprogram.startTime()) && endTime.isBefore(scheduleForChannelScheduledprogram.endTime());
 
         if (isSameStartTime || isStartTimeDuringOtherProgramAirTime || isEndTimeDuringOtherProgramAirTime) {
-            throw new ApiException("Cannot add program to schedule, conflicting with: " + channelScheduledprogram.programName(), HttpStatus.BAD_REQUEST);
+            throw new ApiException("Cannot add program to schedule, conflicting with: " + scheduleForChannelScheduledprogram.programName(), HttpStatus.BAD_REQUEST);
         }
     }
 }

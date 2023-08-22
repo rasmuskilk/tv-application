@@ -3,12 +3,11 @@ package com.example.tvApp.repository;
 import com.example.tvApp.helpers.enums.ProgramType;
 import com.example.tvApp.mapper.rowMapper.ChannelScheduledProgramRowMapper;
 import com.example.tvApp.model.ScheduledProgram;
-import com.example.tvApp.model.dto.channelDTO.ChannelScheduledProgram;
+import com.example.tvApp.model.dto.scheduleDTO.ScheduleForChannel;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public interface ScheduledProgramRepository extends ListCrudRepository<Scheduled
                 LEFT JOIN programs p ON p.id = sp.program_id
                 ORDER BY sp.start_time
             """, rowMapperClass = ChannelScheduledProgramRowMapper.class)
-    List<ChannelScheduledProgram> findAllForChannels();
+    List<ScheduleForChannel> findAllForChannels();
 
     @Query(value = """
                 SELECT sp.end_time AS endTime, sp.start_time AS startTime, sp.recurring_days as recurringDays, sp.start_date as startDate, sp.end_date as endDate,
@@ -35,7 +34,7 @@ public interface ScheduledProgramRepository extends ListCrudRepository<Scheduled
                 WHERE sp.channel_id = :channelId
                 ORDER BY sp.start_time
             """, rowMapperClass = ChannelScheduledProgramRowMapper.class)
-    List<ChannelScheduledProgram> findAllByChannelId(Integer channelId);
+    List<ScheduleForChannel> findAllByChannelId(Integer channelId);
 
     @Query(value = """
                 SELECT sp.end_time AS endTime, sp.start_time AS startTime, sp.recurring_days as recurringDays, sp.start_date as startDate, sp.end_date as endDate,
@@ -47,7 +46,7 @@ public interface ScheduledProgramRepository extends ListCrudRepository<Scheduled
                 WHERE p.program_type = :programType
                 ORDER BY sp.start_time
             """, rowMapperClass = ChannelScheduledProgramRowMapper.class)
-    List<ChannelScheduledProgram> findAllByProgramType(ProgramType programType);
+    List<ScheduleForChannel> findAllByProgramType(ProgramType programType);
 
     @Modifying
     @Query(value = """

@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,9 +36,10 @@ public class ProgramController {
             description = "Success response",
             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Program.class)))
     )
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping()
-    public ResponseEntity<List<Program>> getPrograms() {
-        return new ResponseEntity<>(programService.getPrograms(), HttpStatus.OK);
+    public List<Program> getPrograms() {
+        return programService.getPrograms();
     }
 
     @Operation(summary = "Get program by ID")
@@ -56,8 +56,8 @@ public class ProgramController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Program> getProgramById(@PathVariable Integer id) {
-        return new ResponseEntity<>(programService.getProgramById(id), HttpStatus.OK);
+    public Program getProgramById(@PathVariable Integer id) {
+        return programService.getProgramById(id);
     }
 
     @Operation(summary = "Get all programs by program type")
@@ -74,9 +74,10 @@ public class ProgramController {
             ),
     })
     @GetMapping("/type/{programType}")
-    public ResponseEntity<List<Program>> getProgramsByProgramType(@PathVariable String programType) {
+    @ResponseStatus(HttpStatus.OK)
+    public List<Program> getProgramsByProgramType(@PathVariable String programType) {
         ProgramType type = ValidationHelpers.validateAndReturnProgramType(programType);
-        return new ResponseEntity<>(programService.getByProgramType(type), HttpStatus.OK);
+        return programService.getByProgramType(type);
     }
 
     @Operation(summary = "Create new program")
@@ -88,8 +89,9 @@ public class ProgramController {
             )
     })
     @PostMapping()
-    public ResponseEntity<Program> createProgram(@RequestBody ProgramCreate programCreate) {
-        return new ResponseEntity<>(programService.createProgram(programCreate), HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Program createProgram(@RequestBody ProgramCreate programCreate) {
+        return programService.createProgram(programCreate);
     }
 
     @Operation(summary = "Update program")
@@ -106,8 +108,9 @@ public class ProgramController {
             )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Program> updateProgram(@PathVariable Integer id, @RequestBody ProgramCreate programUpdate) {
-        return new ResponseEntity<>(programService.updateProgram(id, programUpdate), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public Program updateProgram(@PathVariable Integer id, @RequestBody ProgramCreate programUpdate) {
+        return programService.updateProgram(id, programUpdate);
     }
 
     @Operation(summary = "Delete program")
@@ -124,7 +127,8 @@ public class ProgramController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Program> deleteProgramById(@PathVariable Integer id) {
-        return new ResponseEntity<>(programService.deleteProgramById(id), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public Program deleteProgramById(@PathVariable Integer id) {
+        return programService.deleteProgramById(id);
     }
 }

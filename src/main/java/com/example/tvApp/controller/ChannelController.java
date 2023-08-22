@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,8 +35,9 @@ public class ChannelController {
             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Channel.class)))
     )
     @GetMapping("channels")
-    public ResponseEntity<List<Channel>> getAllChannels() {
-        return new ResponseEntity<>(channelService.getAllChannels(), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public List<Channel> getAllChannels() {
+        return channelService.getAllChannels();
     }
 
     @Operation(summary = "Get channel by ID")
@@ -47,8 +47,9 @@ public class ChannelController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Channel.class))
     )
     @GetMapping("channels/{id}")
-    public ResponseEntity<Channel> getChannelById(@PathVariable Integer id) {
-        return new ResponseEntity<>(channelService.getChannelById(id), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public Channel getChannelById(@PathVariable Integer id) {
+        return channelService.getChannelById(id);
     }
 
     @Operation(summary = "Create new channel")
@@ -60,8 +61,9 @@ public class ChannelController {
             )
     })
     @PostMapping("channels")
-    public ResponseEntity<Channel> createChannel(@RequestBody ChannelCreate channelCreate) {
-        return new ResponseEntity<>(channelService.createChannel(channelCreate), HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Channel createChannel(@RequestBody ChannelCreate channelCreate) {
+        return channelService.createChannel(channelCreate);
     }
 
     @Operation(summary = "Update existing channel")
@@ -78,8 +80,9 @@ public class ChannelController {
             )
     })
     @PutMapping("/channels/{id}")
-    public ResponseEntity<Channel> updateChannel(@PathVariable Integer id, @RequestBody ChannelCreate channelUpdate) {
-        return new ResponseEntity<>(channelService.updateChannel(id, channelUpdate), HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.OK)
+    public Channel updateChannel(@PathVariable Integer id, @RequestBody ChannelCreate channelUpdate) {
+        return channelService.updateChannel(id, channelUpdate);
     }
 
     @Operation(summary = "Delete existing channel")
@@ -96,7 +99,8 @@ public class ChannelController {
             )
     })
     @DeleteMapping("channels/{id}")
-    public ResponseEntity<Channel> deleteChannelById(@PathVariable Integer id) {
-        return new ResponseEntity<>(channelService.deleteChannelById(id), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public Channel deleteChannelById(@PathVariable Integer id) {
+        return channelService.deleteChannelById(id);
     }
 }

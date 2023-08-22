@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,13 +44,14 @@ public class ScheduledProgramController {
             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ScheduleForAllChannels.class)))
     )
     @GetMapping()
-    public ResponseEntity<List<ScheduleForAllChannels>> getScheduleForAllChannels(
+    @ResponseStatus(HttpStatus.OK)
+    public List<ScheduleForAllChannels> getScheduleForAllChannels(
             @Parameter(description = "Format - YYYY-MM-DD")
             @RequestParam(required = false) LocalDate startDate,
             @Parameter(description = "Format - YYYY-MM-DD")
             @RequestParam(required = false) LocalDate endDate
     ) {
-        return new ResponseEntity<>(scheduledProgramService.getScheduleForAllChannels(startDate, endDate), HttpStatus.OK);
+        return scheduledProgramService.getScheduleForAllChannels(startDate, endDate);
     }
 
     @Operation(summary = "Get schedule for specific channel")
@@ -68,14 +68,15 @@ public class ScheduledProgramController {
             )
     })
     @GetMapping("/channel/{channelId}")
-    public ResponseEntity<List<ScheduleGet>> getScheduleByChannelId(
+    @ResponseStatus(HttpStatus.OK)
+    public List<ScheduleGet> getScheduleByChannelId(
             @PathVariable Integer channelId,
             @Parameter(description = "Format - YYYY-MM-DD")
             @RequestParam(required = false) LocalDate startDate,
             @Parameter(description = "Format - YYYY-MM-DD")
             @RequestParam(required = false) LocalDate endDate
     ) {
-        return new ResponseEntity<>(scheduledProgramService.getScheduleByChannelId(channelId, startDate, endDate), HttpStatus.OK);
+        return scheduledProgramService.getScheduleByChannelId(channelId, startDate, endDate);
     }
 
     @Operation(summary = "Get schedule for programs with specific program type")
@@ -92,7 +93,8 @@ public class ScheduledProgramController {
             ),
     })
     @GetMapping("/type/{programType}")
-    public ResponseEntity<List<ScheduleForAllChannels>> getScheduleByChannelIdAndByProgramType(
+    @ResponseStatus(HttpStatus.OK)
+    public List<ScheduleForAllChannels> getScheduleByChannelIdAndByProgramType(
             @Parameter(description = "NEWS, MOVIE, DOCUMENTARY, ANIMATION, KIDS_SHOW, TV_SHOW")
             @PathVariable String programType,
             @Parameter(description = "Format - YYYY-MM-DD")
@@ -102,7 +104,7 @@ public class ScheduledProgramController {
     ) {
         ProgramType type = ValidationHelpers.validateAndReturnProgramType(programType);
 
-        return new ResponseEntity<>(scheduledProgramService.getScheduleByProgramType(type, startDate, endDate), HttpStatus.OK);
+        return scheduledProgramService.getScheduleByProgramType(type, startDate, endDate);
     }
 
     @Operation(summary = "Add program to schedule")
@@ -129,10 +131,11 @@ public class ScheduledProgramController {
             )
     })
     @PostMapping("/channel/{channelId}/program")
-    public ResponseEntity<ScheduledProgramCreated> addProgramToChannelByProgramId(
+    @ResponseStatus(HttpStatus.CREATED)
+    public ScheduledProgramCreated addProgramToChannelByProgramId(
             @PathVariable Integer channelId,
             @RequestBody ScheduleProgramCreate programToSchedule) throws JsonProcessingException {
-        return new ResponseEntity<>(scheduledProgramService.addProgramToChannelScheduleByProgramId(channelId, programToSchedule), HttpStatus.CREATED);
+        return scheduledProgramService.addProgramToChannelScheduleByProgramId(channelId, programToSchedule);
     }
 
     @Operation(summary = "Remove program from schedule")
@@ -154,11 +157,12 @@ public class ScheduledProgramController {
             ),
     })
     @DeleteMapping("/channel/{channelId}/program/{programId}")
-    public ResponseEntity<Boolean> removeProgramFromSchedule(
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean removeProgramFromSchedule(
             @PathVariable Integer channelId,
             @PathVariable Integer programId) {
 
-        return new ResponseEntity<>(scheduledProgramService.removeProgramFromSchedule(channelId, programId), HttpStatus.OK);
+        return scheduledProgramService.removeProgramFromSchedule(channelId, programId);
 
     }
 }
